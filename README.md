@@ -31,7 +31,7 @@ graph TD
 
 ### Clone & Install
 ```bash
-git clone https://github.com/<you>/keep-typing.git
+git clone https://github.com/rohan-patnaik/keep-typing.git
 cd keep-typing
 npm install
 ```
