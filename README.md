@@ -1,17 +1,15 @@
-<!-- README.md -->
-
 # keep-typing
 
 A free, customizable, minimalistic typing-test web app to practice and improve typing speed and accuracy.
 
 ## Tech Stack & Architecture
 
-- Frontend: Next.js (React + TypeScript)  
-- Styling: Tailwind CSS  
-- Backend & Auth: Supabase (PostgreSQL)  
-- Testing: Jest (unit), Cypress (E2E)  
-- CI/CD: GitHub Actions  
-- Hosting: Vercel (frontend), Supabase (backend)  
+- Frontend: Next.js (React + TypeScript)
+- Styling: Tailwind CSS
+- Backend & Auth: Supabase (PostgreSQL)
+- Testing: Jest (unit), Cypress (E2E)
+- CI/CD: GitHub Actions
+- Hosting: Vercel (frontend), Supabase (backend)
 - Monitoring: Sentry (errors), Plausible (analytics)
 
 ```mermaid
@@ -26,7 +24,7 @@ graph TD
 ## Getting Started
 
 ### Prerequisites
-- Node.js ≥16, npm or yarn  
+- Node.js ≥16, npm or yarn
 - Supabase project (FREE tier)
 
 ### Clone & Install
@@ -39,7 +37,7 @@ npm install
 ### Environment Variables
 ```bash
 cp .env.example .env.local
-# then set inside .env.local:
+# then edit .env.local:
 # NEXT_PUBLIC_SUPABASE_URL=
 # NEXT_PUBLIC_SUPABASE_ANON_KEY=
 ```
@@ -49,41 +47,36 @@ cp .env.example .env.local
 npm run dev   # http://localhost:3000
 ```
 
-## Database Migrations & Seeding (Optional)
-If you opt into Prisma:
-```bash
-npx prisma migrate dev
-npx prisma db seed
-```
-
 ## Scripts
-- `npm run dev` → dev server  
-- `npm run build` → production build  
-- `npm start` → serve production build  
-- `npm test` → unit tests (Jest)  
-- `npm run test:e2e` → E2E tests (Cypress)  
-- `npm run lint` → ESLint  
+- `npm run dev` → dev server
+- `npm run build` → production build
+- `npm start` → serve production build
+- `npm run lint` → ESLint
+- `npm test` → placeholder (no tests yet)
+- `npm run test:e2e` → placeholder (no E2E tests yet)
 - `npm run format` → Prettier
-
-## Deployment & CI/CD
-- Push to `main` triggers GitHub Actions: lint, test, build  
-- On success, auto-deploy to Vercel
 
 ## Folder Structure
 ```plaintext
 keep-typing/
 ├── .github/
 │   └── workflows/ci.yml
-├── public/
-├── src/
-│   ├── pages/        # Next.js routes
-│   ├── components/   # UI components
-│   ├── lib/          # hooks & utils
-│   ├── styles/       # global & module CSS
-│   └── types/        # TS interfaces & types
-├── cypress/          # E2E tests
-├── prisma/           # optional
+├── .gitignore
 ├── .env.example
 ├── next.config.js
-└── package.json
+├── package.json
+├── postcss.config.js
+├── tailwind.config.js
+├── tsconfig.json
+├── .eslintrc.json
+├── .prettierrc
+├── src/
+│   ├── pages/
+│   │   ├── _app.tsx
+│   │   └── index.tsx
+│   └── styles/
+│       └── globals.css
+└── docs/
+    ├── PRD.md
+    └── UX_UI_Sketches.md
 ```

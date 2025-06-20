@@ -1,6 +1,3 @@
-
-<!-- UX_UI_Sketches.md -->
-
 # UX/UI Sketches
 
 ## 1. User Flows
@@ -18,11 +15,11 @@ flowchart LR
 ┌────────────────────────────────────────────┐
 │ keep-typing                                │
 ├────────────────────────────────────────────┤
-│ [30 s Test]  [60 s Test]  [Quote Mode]      │
+│ [30 s Test]  [60 s Test]  [Quote Mode]     │
 │                                            │
 │ [Upload Custom Word List]                  │
 ├────────────────────────────────────────────┤
-│ Light/Dark [●]   Font: [Serif▼]             │
+│ Light/Dark [●]   Font: [Serif▼]            │
 └────────────────────────────────────────────┘
 
 ## 3. Test Screen
@@ -39,9 +36,12 @@ flowchart TB
     Hint["Enter: start/pause | Esc: reset"]
   end
   TopBar --> Main --> Bottom
+```
 
-4. Summary Screen
+## 4. Summary Screen
 
+```mermaid
 flowchart TB
   Summary[Summary: WPM | Accuracy] --> Chart[Chart: WPM over Time]
   Chart --> Actions[Retry / New Test]
+```
