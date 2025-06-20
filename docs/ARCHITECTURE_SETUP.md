@@ -31,7 +31,7 @@ Supabase (Auth, Postgres)
 
 ### Clone & Install
 ```bash
-git clone https://github.com/<your-org>/keep-typing.git
+git clone https://github.com/rohan-patnaik/keep-typing.git
 cd keep-typing
 npm install
 ```
