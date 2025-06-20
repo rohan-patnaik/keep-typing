@@ -1,13 +1,31 @@
+
 <!-- UX_UI_Sketches.md -->
 
 # UX/UI Sketches
 
+## 1. User Flows
+
 ```mermaid
 flowchart LR
-  A[Home] --> B(Start Test)
-  A --> C(Upload Word List)
-  B --> D[Test Screen]
+  Home[Home] --> Start(Start Test)
+  Home --> Upload(Upload Word List)
+  Start --> TestScreen[Test Screen]
+  TestScreen --> Summary[Summary Screen]
 ```
+
+## 2. Home Screen (Wireframe)
+
+┌────────────────────────────────────────────┐
+│ keep-typing                                │
+├────────────────────────────────────────────┤
+│ [30 s Test]  [60 s Test]  [Quote Mode]      │
+│                                            │
+│ [Upload Custom Word List]                  │
+├────────────────────────────────────────────┤
+│ Light/Dark [●]   Font: [Serif▼]             │
+└────────────────────────────────────────────┘
+
+## 3. Test Screen
 
 ```mermaid
 flowchart TB
@@ -15,21 +33,15 @@ flowchart TB
     WPM[WPM | Accuracy | Timer]
   end
   subgraph Main
-    Text["…typing text…"]
+    Text["…typing text here…"]
   end
   subgraph Bottom
-    Hint["Enter/Esc to start/restart"]
+    Hint["Enter: start/pause | Esc: reset"]
   end
   TopBar --> Main --> Bottom
-```
 
-```mermaid
+4. Summary Screen
+
 flowchart TB
-  S[Summary: WPM | Accuracy] --> C[Chart: WPM over Time]
-  C --> B[Retry / New Test]
-```
-
-**Notes**  
-- Home: select test mode or upload list  
-- Test: live stats + typing input  
-- Results: metrics + retry/new
+  Summary[Summary: WPM | Accuracy] --> Chart[Chart: WPM over Time]
+  Chart --> Actions[Retry / New Test]
