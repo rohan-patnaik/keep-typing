@@ -1,48 +1,67 @@
 // src/lib/metrics.ts
 
+export interface MetricsInput {
+  totalKeystrokes: number;
+  correctKeystrokes: number;
+  durationSeconds: number;
+}
+
+export interface MetricsOutput {
+  rawWpm: number;
+  netWpm: number;
+  accuracy: number;
+}
+
+function validateDuration(seconds: number): void {
+  if (seconds <= 0) {
+    throw new Error('durationSeconds must be > 0');
+  }
+}
+
 /**
- * Computes raw words per minute (gross WPM) based on total characters typed
- * and elapsed time.
- * @param charCount Number of characters typed.
- * @param elapsedSec Elapsed time in seconds.
- * @returns Raw WPM.
+ * Raw WPM = (total keystrokes ÷ 5) ÷ (durationMinutes)
  */
-export function computeRawWPM(
-    charCount: number,
-    elapsedSec: number
-  ): number {
-    if (elapsedSec <= 0) return 0;
-    const words = charCount / 5;
-    return (words / elapsedSec) * 60;
+export function computeRawWpm(
+  totalKeystrokes: number,
+  durationSeconds: number
+): number {
+  validateDuration(durationSeconds);
+  return (totalKeystrokes * 60) / (5 * durationSeconds);
+}
+
+/**
+ * Net WPM = (correct keystrokes ÷ 5) ÷ (durationMinutes)
+ */
+export function computeNetWpm(
+  correctKeystrokes: number,
+  durationSeconds: number
+): number {
+  validateDuration(durationSeconds);
+  return (correctKeystrokes * 60) / (5 * durationSeconds);
+}
+
+/**
+ * Accuracy % = (correct keystrokes ÷ total keystrokes) × 100
+ */
+export function computeAccuracy(
+  correctKeystrokes: number,
+  totalKeystrokes: number
+): number {
+  if (totalKeystrokes <= 0) {
+    return 0;
   }
-  
-  /**
-   * Computes net words per minute (only correctly typed characters)
-   * over elapsed time.
-   * @param correctCharCount Number of correctly typed characters.
-   * @param elapsedSec Elapsed time in seconds.
-   * @returns Net WPM.
-   */
-  export function computeNetWPM(
-    correctCharCount: number,
-    elapsedSec: number
-  ): number {
-    if (elapsedSec <= 0) return 0;
-    const words = correctCharCount / 5;
-    return (words / elapsedSec) * 60;
-  }
-  
-  /**
-   * Computes typing accuracy as a percentage of correctly typed characters
-   * over total characters in the reference text.
-   * @param correctCharCount Number of correctly typed characters.
-   * @param totalCharCount Total characters in reference text.
-   * @returns Accuracy percentage (0–100).
-   */
-  export function computeAccuracy(
-    correctCharCount: number,
-    totalCharCount: number
-  ): number {
-    if (totalCharCount <= 0) return 0;
-    return (correctCharCount / totalCharCount) * 100;
-  }
+  return (correctKeystrokes / totalKeystrokes) * 100;
+}
+
+/**
+ * Bundle all metrics together.
+ */
+export function computeMetrics(input: MetricsInput): MetricsOutput {
+  const { totalKeystrokes, correctKeystrokes, durationSeconds } = input;
+  validateDuration(durationSeconds);
+  return {
+    rawWpm: computeRawWpm(totalKeystrokes, durationSeconds),
+    netWpm: computeNetWpm(correctKeystrokes, durationSeconds),
+    accuracy: computeAccuracy(correctKeystrokes, totalKeystrokes),
+  };
+}
