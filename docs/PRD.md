@@ -23,7 +23,7 @@
 - [x] #7 – Bump Next.js → ≥ 14.2.30 to patch critical vulnerabilities  
 
 ### EPIC 2: Typing Engine & Real-Time Feedback  
-- [ ] #8 – Timer logic for 30 s & 60 s modes  
+- [x] #8 – Timer logic for 30 s & 60 s modes  
 - [ ] #9 – Compute WPM, raw WPM & accuracy  
 - [ ] #10 – Build TestScreen UI + keyboard events (start/pause, caps-lock warning)  
 - [ ] #11 – Unit tests for engine logic (Jest)
