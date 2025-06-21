@@ -1,109 +1,130 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, {
+  useState,
+  useEffect,
+  useRef,
+  ChangeEvent,
+  FC,
+} from 'react';
 import { Timer } from '../lib/timer';
+import { computeMetrics, MetricsOutput } from '../lib/metrics';
 
-const DEFAULT_DURATION = 30; // seconds
-const referenceText = 'The quick brown fox jumps over the lazy dog.';
+export type TestScreenProps = {
+  text: string;
+  duration: number; // in seconds
+};
 
-export default function TestScreen() {
-  const [remaining, setRemaining] = useState(DEFAULT_DURATION);
-  const [isRunning, setIsRunning] = useState(false);
-  const [capsLockOn, setCapsLockOn] = useState(false);
-  const [inputValue, setInputValue] = useState('');
-  const timerRef = useRef<Timer>();
-  const textareaRef = useRef<HTMLTextAreaElement>(null);
+const TestScreen: FC<TestScreenProps> = ({ text, duration }) => {
+  const [remaining, setRemaining] = useState<number>(duration);
+  const [isRunning, setIsRunning] = useState<boolean>(false);
+  const [inputValue, setInputValue] = useState<string>('');
+  const [capsLockOn, setCapsLockOn] = useState<boolean>(false);
 
-  // Initialize Timer
+  const timerRef = useRef<Timer | null>(null);
+
+  // Initialize Timer on mount or duration change
   useEffect(() => {
-    timerRef.current = new Timer(DEFAULT_DURATION, {
-      onTick: secs => setRemaining(secs),
+    timerRef.current = new Timer(duration, {
+      onTick: (r) => setRemaining(r),
       onComplete: () => setIsRunning(false),
     });
     return () => {
-      timerRef.current?.stop();
+      timerRef.current?.pause();
     };
-  }, []);
+  }, [duration]);
 
-  // Autofocus textarea when test starts
+  // Listen for Enter (start/pause) and CapsLock events
   useEffect(() => {
-    if (isRunning) {
-      textareaRef.current?.focus();
-    }
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Enter') {
+        e.preventDefault();
+        if (!isRunning) {
+          timerRef.current?.start();
+          setIsRunning(true);
+        } else {
+          timerRef.current?.pause();
+          setIsRunning(false);
+        }
+      }
+      if (e.getModifierState && e.getModifierState('CapsLock')) {
+        setCapsLockOn(true);
+      } else {
+        setCapsLockOn(false);
+      }
+    };
+    const handleKeyUp = (e: KeyboardEvent) => {
+      if (e.getModifierState && !e.getModifierState('CapsLock')) {
+        setCapsLockOn(false);
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    window.addEventListener('keyup', handleKeyUp);
+    return () => {
+      window.removeEventListener('keydown', handleKeyDown);
+      window.removeEventListener('keyup', handleKeyUp);
+    };
   }, [isRunning]);
 
-  // Global keyboard: detect CapsLock state
-  useEffect(() => {
-    const handleKey = (e: KeyboardEvent) => {
-      setCapsLockOn(e.getModifierState('CapsLock'));
-    };
-    window.addEventListener('keydown', handleKey);
-    window.addEventListener('keyup', handleKey);
-    return () => {
-      window.removeEventListener('keydown', handleKey);
-      window.removeEventListener('keyup', handleKey);
-    };
-  }, []);
+  const elapsed = duration - remaining;
+  let metrics: MetricsOutput = { rawWpm: 0, netWpm: 0, accuracy: 0 };
+  if (elapsed > 0) {
+    metrics = computeMetrics({
+      totalKeystrokes: inputValue.length,
+      correctKeystrokes: inputValue
+        .split('')
+        .filter((c, i) => text[i] === c).length,
+      durationSeconds: elapsed,
+    });
+  }
 
-  // Handlers for buttons
-  const handleStartPause = () => {
+  const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
     if (isRunning) {
-      timerRef.current?.pause();
-      setIsRunning(false);
-    } else {
-      timerRef.current?.start();
-      setIsRunning(true);
+      setInputValue(e.target.value);
     }
   };
 
-  const handleReset = () => {
-    timerRef.current?.reset();
-    setIsRunning(false);
-    setInputValue('');
+  const toggleStartPause = () => {
+    if (!isRunning) {
+      timerRef.current?.start();
+      setIsRunning(true);
+    } else {
+      timerRef.current?.pause();
+      setIsRunning(false);
+    }
   };
 
   return (
-    <div className="flex flex-col items-center p-6 space-y-4">
-      <div className="text-2xl font-medium">
-        Time Remaining: {remaining}s
-      </div>
-
-      <div className="flex space-x-2">
-        <button
-          className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
-          onClick={handleStartPause}
-        >
-          {isRunning ? 'Pause' : 'Start'}
-        </button>
-        <button
-          className="px-4 py-2 bg-gray-500 text-white rounded hover:bg-gray-600"
-          onClick={handleReset}
-        >
-          Reset
-        </button>
+    <div className="p-4">
+      <div className="flex justify-between mb-4">
+        <div>Time: {remaining}s</div>
+        <div>WPM: {metrics.rawWpm.toFixed(0)}</div>
+        <div>Accuracy: {metrics.accuracy.toFixed(1)}%</div>
       </div>
 
       {capsLockOn && (
-        <div className="text-red-600">Warning: Caps Lock is on</div>
+        <div className="text-red-500 mb-2">Warning: CapsLock is on</div>
       )}
 
-      <div className="w-full max-w-3xl">
-        <div className="p-4 mb-2 border rounded bg-gray-50">
-          <p>{referenceText}</p>
-        </div>
-        <textarea
-          ref={textareaRef}
-          className="w-full h-36 p-2 border rounded focus:outline-none focus:ring"
-          value={inputValue}
-          onChange={e => setInputValue(e.target.value)}
-          disabled={!isRunning}
-          placeholder={
-            isRunning ? 'Start typing...' : 'Click Start to begin...'
-          }
-        />
-      </div>
+      <p className="mb-4">{text}</p>
 
-      <div className="text-sm text-gray-500">
-        Use buttons above to Start/Pause or Reset
+      <input
+        type="text"
+        className="w-full p-2 border"
+        value={inputValue}
+        onChange={handleChange}
+        disabled={!isRunning}
+        autoFocus={!isRunning}
+      />
+
+      <div className="mt-2">
+        <button
+          onClick={toggleStartPause}
+          className="px-4 py-2 bg-blue-600 text-white rounded"
+        >
+          {isRunning ? 'Pause' : 'Start'}
+        </button>
       </div>
     </div>
   );
-}
+};
+
+export default TestScreen;

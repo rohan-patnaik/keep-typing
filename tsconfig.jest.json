@@ -1,0 +1,7 @@
+{
+    "extends": "./tsconfig.json",
+    "compilerOptions": {
+      // compile TSX into React.createElement calls
+      "jsx": "react-jsx"
+    }
+  }
