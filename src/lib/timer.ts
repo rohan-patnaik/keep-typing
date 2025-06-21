@@ -1,68 +1,55 @@
 // src/lib/timer.ts
 
-type TimerCallbacks = {
-    onTick?: (remainingSeconds: number) => void;
-    onComplete?: () => void;
-  };
-  
-  /**
-   * Timer counts down from a given duration (in seconds),
-   * calling back on each tick and on completion.
-   */
-  export class Timer {
-    private duration: number;
-    private remaining: number;
-    private intervalId: ReturnType<typeof setInterval> | null = null;
-    private onTick?: (remainingSeconds: number) => void;
-    private onComplete?: () => void;
-  
-    constructor(durationSeconds: number, callbacks?: TimerCallbacks) {
-      this.duration = durationSeconds;
-      this.remaining = durationSeconds;
-      this.onTick = callbacks?.onTick;
-      this.onComplete = callbacks?.onComplete;
-    }
-  
-    /** Start the countdown (no-op if already running). */
-    start() {
-      if (this.intervalId) return;
-      this.intervalId = setInterval(() => {
-        this.remaining -= 1;
-        this.onTick?.(this.remaining);
-  
-        if (this.remaining <= 0) {
-          this.stop();
-          this.onComplete?.();
-        }
-      }, 1000);
-    }
-  
-    /** Pause the countdown (alias for stop). */
-    pause() {
-      if (!this.intervalId) return;
+export type TimerOptions = {
+  onTick?: (remaining: number) => void;
+  onComplete?: () => void;
+};
+
+export class Timer {
+  private duration: number;
+  private remaining: number;
+  private intervalId: NodeJS.Timeout | null = null;
+  private options: TimerOptions;
+
+  constructor(durationSeconds: number, options: TimerOptions = {}) {
+    this.duration = durationSeconds;
+    this.remaining = durationSeconds;
+    this.options = options;
+  }
+
+  start(): void {
+    if (this.intervalId) return;
+    this.intervalId = setInterval(() => {
+      this.remaining = Math.max(0, this.remaining - 1);
+      this.options.onTick?.(this.remaining);
+      if (this.remaining <= 0) {
+        this.clearInterval();
+        this.options.onComplete?.();
+      }
+    }, 1000);
+  }
+
+  pause(): void {
+    this.clearInterval();
+  }
+
+  reset(): void {
+    this.clearInterval();
+    this.remaining = this.duration;
+  }
+
+  getRemaining(): number {
+    return this.remaining;
+  }
+
+  isRunning(): boolean {
+    return this.intervalId !== null;
+  }
+
+  private clearInterval(): void {
+    if (this.intervalId) {
       clearInterval(this.intervalId);
       this.intervalId = null;
     }
-  
-    /** Stop the countdown. */
-    stop() {
-      this.pause();
-    }
-  
-    /** Reset to original duration and trigger a tick callback. */
-    reset() {
-      this.stop();
-      this.remaining = this.duration;
-      this.onTick?.(this.remaining);
-    }
-  
-    /** Returns current remaining seconds. */
-    getTime(): number {
-      return this.remaining;
-    }
-  
-    /** Returns true if timer is active. */
-    isRunning(): boolean {
-      return this.intervalId !== null;
-    }
   }
+}
