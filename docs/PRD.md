@@ -1,4 +1,5 @@
 <!-- docs/PRD.md -->
+<!-- DeepseekR1 approach to be used here -->
 
 # Product Requirements Document (keep-typing)
 
