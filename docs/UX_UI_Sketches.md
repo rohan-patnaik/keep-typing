@@ -12,179 +12,99 @@ flowchart LR
 
 ## Wireframe Screen sketches
 
-Based on the PRD for v1 (MVP) and v2 (Enhancements), you’ll need to design:
-• 4 screens for v1
-• 8 additional screens for v2
-Total: 12 distinct screens.
-Below are ASCII wire-frame mocks for each. After that is a single, detailed “design request” prompt you can feed to your LLM to generate polished UI designs from these mocks.
-–––––––––––––––––––––––––––––––––––––––––––––––––
+ Create minimal V1 (MVP) and V2 (Enhanced) UI flows with toggleable features, update documentation, and provide implementation-ready ASCII mocks.
 
-1. v1: MVP SCREENS
-Screen 1 – Home / Landing
+---
 
-	+------------------------------------------------+
-	| keep-typing                                    |
-	|                                                |
-	|   [30s Test]  [60s Test]  [Quote Mode]         |
-	|                                                |
-	|   [Upload Word List]   [Language ▼]            |
-	|                                                |
-	|   Punctuation: [✓]   Numbers: [ ]              |
-	|   Theme: [Light ▼]   Font: [Serif ▼]            |
-	+------------------------------------------------+
+1. Version-Specific Screen Requirements
 
-Screen 2 – Authentication (Sign In / Sign Up)
+V1 (MVP) - 4 Core Screens
 
-	+------------------------------------------------+
-	| keep-typing    [Switch to Sign Up]             |
-	|                                                |
-	|  Email:    [________________________]          |
-	|  Password: [________________________]          |
-	|                                                |
-	|  [ Sign In ]                                   |
-	|                                                |
-	|  Or continue with: [ Google ] [ GitHub ]       |
-	+------------------------------------------------+
+1. 
 
-Screen 3 – Test Screen
+Home Screen
 
-	+------------------------------------------------+
-	| Time: 30s   |   WPM: 0   |   Accuracy: 0.0%   |
-	| [Warning: CapsLock is on]                     |
-	|                                                |
-	| Hello, world! This is your typing text…        |
-	|                                                |
-	| > [ your typing goes here…__________________]  |
-	|                                                |
-	|                   [ Pause ]                    |
-	+------------------------------------------------+
+	- Test selection (30s/60s/custom)
+	- Basic settings toggles (punctuation/numbers)
+	- No V2 toggle yet
 
-Screen 4 – Summary Screen
+	╔═════════════════════════════════════════════════════════════════════════╗
+	║ keep-typing                                                             ║
+	╠═════════════════════════════════════════════════════════════════════════╣
+	║ [30s] [60s] [Custom]                                                    ║
+	║ Punctuation: [✓]  Numbers: [ ]                                          ║
+	╚═════════════════════════════════════════════════════════════════════════╝
 
-	+------------------------------------------------+
-	|               Test Summary                    |
-	|                                                |
-	|   Final WPM: 75       Accuracy: 92.3%          |
-	|                                                |
-	|   Last 10 Results:                             
-	|   +------------------------------------------+  |
-	|   | 1. 75 WPM | 92.3% | Jan 21              |  |
-	|   | 2. 70 WPM | 90.0% | Jan 20              |  |
-	|   | …                                        |  |
-	|   +------------------------------------------+  |
-	|                                                |
-	|   [ Retry ]    [ New Test ]                    |
-	+------------------------------------------------+
 
-–––––––––––––––––––––––––––––––––––––––––––––––––
 
-1. v2: ENHANCEMENT SCREENS
-Screen 5 – Modes & Difficulty
+2. 
+Auth Screen
 
-	+------------------------------------------------+
-	|              Select Mode & Difficulty         |
-	|                                                |
-	|  Time Modes:  [ •30s ]  [ 60s ] [ 120s ]        |
-	|  Word Modes:  [ •50 ]   [ 75 ]  [ 100 ]         |
-	|                                                |
-	|  Difficulty:  [ •Easy ] [ Expert ] [ Master ]  |
-	|                                                |
-	|  [ Apply & Back ]                              |
-	+------------------------------------------------+
+	- Unified signin/signup
+	- Social login options
 
-Screen 6 – Settings (Punctuation, Numbers & Theming)
+	╔═════════════════════════════════════════════════════════════════════════╗
+	║ Sign In ● ○ Sign Up                                                     ║
+	╠═════════════════════════════════════════════════════════════════════════╣
+	║ Email: [_________________]                                              ║
+	║ Password: [________________]                                            ║
+	║ [Continue]  [Google] [GitHub]                                           ║
+	╚═════════════════════════════════════════════════════════════════════════╝
 
-	+------------------------------------------------+
-	|                  Settings                     |
-	|                                                |
-	|  Toggles:                                     |
-	|    • Punctuation   [✓]                         |
-	|    • Numbers       [ ]                         |
-	|                                                |
-	|  Appearance:                                  |
-	|    • Theme        [ Light ▼ ] (Dark, Auto)     |
-	|    • Font         [ Serif ▼ ] (Sans, Mono)     |
-	|                                                |
-	|  [ Save & Back ]                               |
-	+------------------------------------------------+
 
-Screen 7 – Custom Word List Upload
 
-	+------------------------------------------------+
-	|              Upload Custom Word List          |
-	|                                                |
-	|  Select file: [ Choose file… ]                 |
-	|  File name:   my-words.txt                    |
-	|                                                |
-	|  [ Preview Words… ]                            |
-	|                                                |
-	|  [ Upload & Apply ]                            |
-	+------------------------------------------------+
+3. 
+Summary Screen
 
-Screen 8 – Language Selector
+	- WPM/accuracy results
+	- Basic retry/new test actions
 
-	+------------------------------------------------+
-	|                Choose Language                |
-	|                                                |
-	|  [ •English ]  [ Spanish ]  [ French ]         |
-	|                                                |
-	|  [ Apply & Back ]                              |
-	+------------------------------------------------+
+	╔═════════════════════════════════════════════════════════════════════════╗
+	║ 72 WPM | 96% Accuracy                                                   ║
+	╠═════════════════════════════════════════════════════════════════════════╣
+	║ █▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁█  (Simple chart)                                 ║
+	║ [Retry] [New Test]                                                      ║
+	╚═════════════════════════════════════════════════════════════════════════╝
 
-Screen 9 – Advanced Analytics
 
-	+------------------------------------------------+
-	|                Analytics                      |
-	|                                                |
-	|  Consistency Score: 85                        |
-	|                                                |
-	|  Error Heatmap:                               
-	|  +------+------+------+                        |
-	|  |  a   |  b   |  c   |                        |
-	|  +------+------+------+                        |
-	|  | ... more rows ...  |                        |
-	|  +------+------+------+                        |
-	|                                                |
-	|  [ Back ]                                      |
-	+------------------------------------------------+
 
-Screen 10 – Leaderboards
+4. 
+Leaderboard Screen
 
-	+------------------------------------------------+
-	|               Leaderboards                    |
-	|                                                |
-	|  [ Global ]   [ Friends ]                     |
-	|                                                |
-	|  1. Alice    88 WPM | 95.0%                   |
-	|  2. Bob      85 WPM | 93.2%                   |
-	|  3. …                                         |
-	|                                                |
-	|  [ Back ]                                      |
-	+------------------------------------------------+
+	- Global rankings only
 
-Screen 11 – Theme Builder & Presets
+	╔═════════════════════════════════════════════════════════════════════════╗
+	║ 1. You: 72 WPM                                                          ║
+	║ 2. Alice: 70 WPM                                                        ║
+	║ 3. Bob: 68 WPM                                                          ║
+	╚═════════════════════════════════════════════════════════════════════════╝
 
-	+------------------------------------------------+
-	|               Theme Builder                   |
-	|                                                |
-	|  Primary Color: [■■■■■■] [ Color Picker ▼ ]     |
-	|  Secondary:     [■■■■■■] [ Color Picker ▼ ]     |
-	|                                                |
-	|  Presets: [ Default ] [ MyPreset ▼ ]           |
-	|                                                |
-	|  [ Save Preset ]   [ Apply & Back ]            |
-	+------------------------------------------------+
 
-Screen 12 – Donation / Monetization
 
-	+------------------------------------------------+
-	|            Support keep-typing                 |
-	|                                                |
-	|  If you enjoy keep-typing, please consider:    |
-	|                                                |
-	|    [ Patreon ]   [ Ko-fi ]   [ Donate ]         |
-	|                                                |
-	|  Thank you for your support!                   |
-	+------------------------------------------------+
+V2 (Enhanced) - 5 Screens (V1 + Profile)
+
+1. 
+
+Home Screen
+
+	- Adds V1/V2 toggle
+	- Settings remain minimal
+
+	+ ║ [V1 ● ○ V2]  // Toggle visible during development
+
+
+
+2. 
+Profile Screen (New)
+
+	- User stats/achievements
+
+	╔═════════════════════════════════════════════════════════════════════════╗
+	║ rohan_patnaik | Lvl 38                                                  ║
+	╠═════════════════════════════════════════════════════════════════════════╣
+	║ Tests: 427 | Accuracy: 90%                                              ║
+	║ 30s Best: 78 WPM                                                        ║
+	║ [██████████ 38% to next level]                                          ║
+	╚═════════════════════════════════════════════════════════════════════════╝
 
 –––––––––––––––––––––––––––––––––––––––––––––––––
