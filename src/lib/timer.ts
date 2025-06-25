@@ -1,55 +1,92 @@
-// src/lib/timer.ts
-
-export type TimerOptions = {
-  onTick?: (remaining: number) => void;
-  onComplete?: () => void;
-};
+export type TimerCallback = (remaining: number) => void;
 
 export class Timer {
-  private duration: number;
-  private remaining: number;
-  private intervalId: NodeJS.Timeout | null = null;
-  private options: TimerOptions;
+  private durationMs: number;
+  private remainingMs: number;
+  private startTime: number | null;
+  private timerId: NodeJS.Timeout | null;
+  private onTick: TimerCallback | null;
+  private onComplete: (() => void) | null;
+  private isRunning: boolean;
+  private lastTickTime: number | null;
 
-  constructor(durationSeconds: number, options: TimerOptions = {}) {
-    this.duration = durationSeconds;
-    this.remaining = durationSeconds;
-    this.options = options;
+  constructor(durationSeconds: number, onTick?: TimerCallback, onComplete?: () => void) {
+    this.durationMs = durationSeconds * 1000;
+    this.remainingMs = durationSeconds * 1000;
+    this.startTime = null;
+    this.timerId = null;
+    this.onTick = onTick || null;
+    this.onComplete = onComplete || null;
+    this.isRunning = false;
+    this.lastTickTime = null;
   }
 
   start(): void {
-    if (this.intervalId) return;
-    this.intervalId = setInterval(() => {
-      this.remaining = Math.max(0, this.remaining - 1);
-      this.options.onTick?.(this.remaining);
-      if (this.remaining <= 0) {
-        this.clearInterval();
-        this.options.onComplete?.();
+    if (this.isRunning) return;
+    this.isRunning = true;
+    this.startTime = Date.now();
+    this.lastTickTime = this.startTime;
+    
+    const tick = () => {
+      if (!this.startTime) return;
+      
+      const now = Date.now();
+      const elapsedMs = now - this.startTime;
+      this.remainingMs = Math.max(0, this.durationMs - elapsedMs);
+      
+      // Calculate remaining seconds (rounded up)
+      const remainingSeconds = Math.ceil(this.remainingMs / 1000);
+      
+      // Call onTick at least once per second
+      if (this.onTick && (!this.lastTickTime || now - this.lastTickTime >= 1000)) {
+        this.onTick(remainingSeconds);
+        this.lastTickTime = now;
       }
-    }, 1000);
+      
+      if (this.remainingMs <= 0) {
+        this.clearTimer();
+        this.isRunning = false;
+        if (this.onComplete) this.onComplete();
+      } else {
+        // Schedule next tick
+        this.timerId = setTimeout(tick, 100);
+      }
+    };
+    
+    this.timerId = setTimeout(tick, 100);
   }
 
   pause(): void {
-    this.clearInterval();
+    if (!this.isRunning || this.timerId === null) return;
+    this.clearTimer();
+    this.isRunning = false;
+    
+    if (this.startTime !== null) {
+      const elapsedMs = Date.now() - this.startTime;
+      this.remainingMs = Math.max(0, this.durationMs - elapsedMs);
+    }
   }
 
   reset(): void {
-    this.clearInterval();
-    this.remaining = this.duration;
+    this.clearTimer();
+    this.isRunning = false;
+    this.remainingMs = this.durationMs;
+    this.startTime = null;
+    this.lastTickTime = null;
   }
 
   getRemaining(): number {
-    return this.remaining;
+    return Math.ceil(this.remainingMs / 1000);
   }
 
-  isRunning(): boolean {
-    return this.intervalId !== null;
+  isTimerRunning(): boolean {
+    return this.isRunning;
   }
 
-  private clearInterval(): void {
-    if (this.intervalId) {
-      clearInterval(this.intervalId);
-      this.intervalId = null;
+  private clearTimer(): void {
+    if (this.timerId) {
+      clearTimeout(this.timerId);
+      this.timerId = null;
     }
   }
 }

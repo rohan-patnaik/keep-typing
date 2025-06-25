@@ -1,5 +1,4 @@
 // src/lib/metrics.ts
-
 export interface MetricsInput {
   totalKeystrokes: number;
   correctKeystrokes: number;
@@ -12,53 +11,34 @@ export interface MetricsOutput {
   accuracy: number;
 }
 
-function validateDuration(seconds: number): void {
-  if (seconds <= 0) {
-    throw new Error('durationSeconds must be > 0');
-  }
+function validateInput(totalKeystrokes: number, correctKeystrokes: number, durationSeconds: number): void {
+  if (totalKeystrokes < 0) throw new Error('totalKeystrokes must be non-negative');
+  if (correctKeystrokes < 0) throw new Error('correctKeystrokes must be non-negative');
+  if (durationSeconds <= 0) throw new Error('durationSeconds must be positive');
+  if (correctKeystrokes > totalKeystrokes) throw new Error('correctKeystrokes cannot exceed totalKeystrokes');
 }
 
-/**
- * Raw WPM = (total keystrokes ÷ 5) ÷ (durationMinutes)
- */
-export function computeRawWpm(
-  totalKeystrokes: number,
-  durationSeconds: number
-): number {
-  validateDuration(durationSeconds);
-  return (totalKeystrokes * 60) / (5 * durationSeconds);
+export function computeRawWpm(totalKeystrokes: number, durationSeconds: number): number {
+  validateInput(totalKeystrokes, 0, durationSeconds); // We don't use correctKeystrokes here, so set to 0 for validation
+  const minutes = durationSeconds / 60;
+  // WPM = (total keystrokes / 5) / minutes
+  return Math.round((totalKeystrokes / 5) / minutes);
 }
 
-/**
- * Net WPM = (correct keystrokes ÷ 5) ÷ (durationMinutes)
- */
-export function computeNetWpm(
-  correctKeystrokes: number,
-  durationSeconds: number
-): number {
-  validateDuration(durationSeconds);
-  return (correctKeystrokes * 60) / (5 * durationSeconds);
+export function computeNetWpm(correctKeystrokes: number, durationSeconds: number): number {
+  validateInput(correctKeystrokes, correctKeystrokes, durationSeconds);
+  const minutes = durationSeconds / 60;
+  return Math.round((correctKeystrokes / 5) / minutes);
 }
 
-/**
- * Accuracy % = (correct keystrokes ÷ total keystrokes) × 100
- */
-export function computeAccuracy(
-  correctKeystrokes: number,
-  totalKeystrokes: number
-): number {
-  if (totalKeystrokes <= 0) {
-    return 0;
-  }
-  return (correctKeystrokes / totalKeystrokes) * 100;
+export function computeAccuracy(correctKeystrokes: number, totalKeystrokes: number): number {
+  if (totalKeystrokes === 0) return 0;
+  return parseFloat(((correctKeystrokes / totalKeystrokes) * 100).toFixed(1));
 }
 
-/**
- * Bundle all metrics together.
- */
 export function computeMetrics(input: MetricsInput): MetricsOutput {
   const { totalKeystrokes, correctKeystrokes, durationSeconds } = input;
-  validateDuration(durationSeconds);
+  validateInput(totalKeystrokes, correctKeystrokes, durationSeconds);
   return {
     rawWpm: computeRawWpm(totalKeystrokes, durationSeconds),
     netWpm: computeNetWpm(correctKeystrokes, durationSeconds),
