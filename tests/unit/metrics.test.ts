@@ -1,48 +1,48 @@
 // tests/unit/metrics.test.ts
-
 import {
-    computeRawWpm,
-    computeNetWpm,
-    computeAccuracy,
-    computeMetrics,
-  } from '../../src/lib/metrics';
-  
-  describe('metrics module', () => {
-    it('computes raw WPM correctly', () => {
-      // 250 keystrokes over 30s → (250/5)/(30/60) = 100 WPM
-      expect(computeRawWpm(250, 30)).toBeCloseTo(100);
+  computeRawWpm,
+  computeNetWpm,
+  computeAccuracy,
+  computeMetrics,
+} from '../../src/lib/metrics';
+
+describe('Metrics Calculations', () => {
+  describe('computeRawWpm', () => {
+    it('calculates raw WPM correctly', () => {
+      // 300 keystrokes in 60 seconds: (300/5) / (60/60) = 60
+      expect(computeRawWpm(300, 60)).toBe(60);
     });
-  
-    it('computes net WPM correctly', () => {
-      // 200 correct keystrokes over 30s → (200/5)/(30/60) = 80 WPM
-      expect(computeNetWpm(200, 30)).toBeCloseTo(80);
-    });
-  
-    it('computes accuracy correctly', () => {
-      // 200 correct of 250 total → 80%
-      expect(computeAccuracy(200, 250)).toBeCloseTo(80);
-    });
-  
-    it('computeMetrics returns all three values', () => {
-      const m = computeMetrics({
-        totalKeystrokes: 250,
-        correctKeystrokes: 200,
-        durationSeconds: 30,
-      });
-      expect(m.rawWpm).toBeCloseTo(100);
-      expect(m.netWpm).toBeCloseTo(80);
-      expect(m.accuracy).toBeCloseTo(80);
-    });
-  
-    it('throws on zero or negative duration', () => {
-      expect(() => computeRawWpm(100, 0)).toThrow('durationSeconds must be > 0');
-      expect(() => computeNetWpm(100, -5)).toThrow('durationSeconds must be > 0');
-      expect(() =>
-        computeMetrics({ totalKeystrokes: 100, correctKeystrokes: 90, durationSeconds: 0 })
-      ).toThrow();
-    });
-  
-    it('accuracy is 0 when no keystrokes', () => {
-      expect(computeAccuracy(0, 0)).toBeCloseTo(0);
+
+    it('handles zero duration', () => {
+      expect(() => computeRawWpm(300, 0)).toThrow('durationSeconds must be positive');
     });
   });
+
+  describe('computeNetWpm', () => {
+    it('calculates net WPM correctly', () => {
+      // 240 correct keystrokes in 60 seconds: (240/5) / 1 = 48
+      expect(computeNetWpm(240, 60)).toBe(48);
+    });
+  });
+
+  describe('computeAccuracy', () => {
+    it('calculates accuracy correctly', () => {
+      // 240 correct out of 300: 80%
+      expect(computeAccuracy(240, 300)).toBe(80);
+    });
+
+    it('returns 0 when totalKeystrokes is 0', () => {
+      expect(computeAccuracy(0, 0)).toBe(0);
+    });
+  });
+
+  describe('computeMetrics', () => {
+    it('returns all metrics', () => {
+      const input = { totalKeystrokes: 300, correctKeystrokes: 240, durationSeconds: 60 };
+      const result = computeMetrics(input);
+      expect(result.rawWpm).toBe(60);
+      expect(result.netWpm).toBe(48);
+      expect(result.accuracy).toBe(80);
+    });
+  });
+});

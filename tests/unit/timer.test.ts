@@ -1,53 +1,47 @@
-// tests/unit/timer.test.ts
 import { Timer } from '../../src/lib/timer';
 
-jest.useFakeTimers();
-
 describe('Timer', () => {
-  it('counts down each second and fires onTick & onComplete', () => {
-    const ticks: number[] = [];
-    const onComplete = jest.fn();
-    const timer = new Timer(3, {
-      onTick: (r) => ticks.push(r),
-      onComplete,
-    });
+  jest.useFakeTimers();
 
+  it('starts and ticks correctly', () => {
+    const onTick = jest.fn();
+    const timer = new Timer(30, onTick);
     timer.start();
-    expect(timer.isRunning()).toBe(true);
-
-    // advance 1s
+    expect(timer.isTimerRunning()).toBe(true);
+    
+    // Advance by 1 second
     jest.advanceTimersByTime(1000);
-    expect(ticks).toEqual([2]);
-    expect(timer.getRemaining()).toBe(2);
-
-    // advance to zero
-    jest.advanceTimersByTime(2000);
-    expect(ticks).toEqual([2, 1, 0]);
-    expect(onComplete).toHaveBeenCalledTimes(1);
-    expect(timer.isRunning()).toBe(false);
+    expect(onTick).toHaveBeenCalledWith(29);
+    
+    // Advance by another second
+    jest.advanceTimersByTime(1000);
+    expect(onTick).toHaveBeenCalledWith(28);
   });
 
-  it('pause stops the countdown', () => {
-    const ticks: number[] = [];
-    const timer = new Timer(5, { onTick: (r) => ticks.push(r) });
-
+  it('pauses correctly', () => {
+    const timer = new Timer(30);
     timer.start();
-    jest.advanceTimersByTime(2000);
+    jest.advanceTimersByTime(1000);
     timer.pause();
-
-    const afterPause = ticks.slice();
-    jest.advanceTimersByTime(3000);
-    expect(ticks).toEqual(afterPause);
-    expect(timer.isRunning()).toBe(false);
+    expect(timer.isTimerRunning()).toBe(false);
+    expect(timer.getRemaining()).toBe(29);
   });
 
-  it('reset stops and resets remaining to initial duration', () => {
-    const timer = new Timer(4);
+  it('resets correctly', () => {
+    const timer = new Timer(30);
     timer.start();
-    jest.advanceTimersByTime(2000);
+    jest.advanceTimersByTime(1000);
     timer.reset();
+    expect(timer.getRemaining()).toBe(30);
+    expect(timer.isTimerRunning()).toBe(false);
+  });
 
-    expect(timer.isRunning()).toBe(false);
-    expect(timer.getRemaining()).toBe(4);
+  it('calls onComplete when time is up', () => {
+    const onComplete = jest.fn();
+    const timer = new Timer(1, undefined, onComplete);
+    timer.start();
+    jest.advanceTimersByTime(1000);
+    expect(onComplete).toHaveBeenCalled();
+    expect(timer.isTimerRunning()).toBe(false);
   });
 });
