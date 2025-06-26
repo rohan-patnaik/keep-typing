@@ -53,7 +53,7 @@
 - [x] #12 – Supabase Auth integration  
 - [x] #13 – Results schema & API  
 - [x] #14 – Save/fetch results  
-- [ ] #15 – SummaryScreen  
+- [x] #15 – SummaryScreen  
 - [ ] #16 – E2E tests  
 
 ### EPIC 4: Core UI Implementation  
