@@ -72,6 +72,7 @@ keep-typing/
 ├── .prettierrc
 ├── src/
 │   ├── lib/
+│   │   ├── metrics.ts
 │   │   └── timer.ts
 │   ├── pages/
 │   │   ├── _app.tsx
