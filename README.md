@@ -71,6 +71,8 @@ keep-typing/
 ├── .eslintrc.json
 ├── .prettierrc
 ├── src/
+│   ├── lib/
+│   │   └── timer.ts
 │   ├── pages/
 │   │   ├── _app.tsx
 │   │   └── index.tsx
