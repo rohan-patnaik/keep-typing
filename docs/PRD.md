@@ -51,7 +51,7 @@
 
 ### EPIC 3: Authentication & Persistence  
 - [x] #12 – Supabase Auth integration  
-- [ ] #13 – Results schema & API  
+- [x] #13 – Results schema & API  
 - [ ] #14 – Save/fetch results  
 - [ ] #15 – SummaryScreen  
 - [ ] #16 – E2E tests  
