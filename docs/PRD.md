@@ -74,8 +74,8 @@
 
 ### EPIC A: Profile & Personalization  
 - [x] #25 – User profile system  
-- [ ] #26 – Achievement tracking  
-- [ ] #27 – Level progression  
+- [x] #26 – Achievement tracking  
+- [x] #27 – Level progression  
 
 ### EPIC B: Enhanced Social Features  
 - [ ] #28 – Friends leaderboards  

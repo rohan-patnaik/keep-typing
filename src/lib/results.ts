@@ -1,5 +1,7 @@
 import { supabase } from './supabaseClient';
 import { MetricsOutput } from './metrics';
+import { checkAndRecordAchievements } from './achievements';
+import { calculateLevel } from './levels';
 
 export interface TestResult {
   id: string;
@@ -50,6 +52,38 @@ export async function saveTestResult(
     console.error('Error saving test result:', error);
     return null;
   }
+
+  // Update user's total WPM for level progression
+  const { data: userData, error: userError } = await supabase
+    .from('auth.users') // Access the auth.users table
+    .select('total_wpm')
+    .eq('id', userId)
+    .single();
+
+  if (userError) {
+    console.error('Error fetching user total_wpm:', userError);
+  } else if (userData) {
+    const newTotalWpm = (userData.total_wpm || 0) + metrics.netWpm;
+    const { error: updateError } = await supabase
+      .from('auth.users')
+      .update({ total_wpm: newTotalWpm })
+      .eq('id', userId);
+
+    if (updateError) {
+      console.error('Error updating user total_wpm:', updateError);
+    } else {
+      console.log(`User ${userId} total WPM updated to ${newTotalWpm}`);
+      // Optionally, you could calculate and log the new level here
+      const levelInfo = calculateLevel(newTotalWpm);
+      console.log(`User ${userId} is now Level ${levelInfo.level} with ${levelInfo.progressToNextLevel}% progress.`);
+    }
+  }
+
+  // Check for and record achievements after saving the test result
+  if (data) {
+    await checkAndRecordAchievements(userId, data);
+  }
+
   return data;
 }
 

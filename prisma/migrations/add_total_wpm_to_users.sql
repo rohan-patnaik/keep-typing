@@ -1,0 +1,2 @@
+ALTER TABLE auth.users
+ADD COLUMN total_wpm INT DEFAULT 0;
