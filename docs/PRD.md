@@ -57,10 +57,10 @@
 - [x] #16 – E2E tests  
 
 ### EPIC 4: Core UI Implementation  
-- [ ] #17 – Implement Home screen (V1)  
-- [ ] #18 – Implement Auth screen  
-- [ ] #19 – Implement Summary screen  
-- [ ] #20 – Implement Leaderboard (V1)  
+- [x] #17 – Implement Home screen (V1)  
+- [x] #18 – Implement Auth screen  
+- [x] #19 – Implement Summary screen  
+- [x] #20 – Implement Leaderboard (V1)  
 
 ### EPIC 5: QA & Deployment  
 - [ ] #21 – Final QA  
@@ -106,6 +106,7 @@
 ║ Punctuation: [✓]  Numbers: [ ]                                          ║
 ╚═════════════════════════════════════════════════════════════════════════╝
 ```
+- [x] #17 – Implement Home screen (V1)
 
 ### Home Screen (V2)
 ```ascii
@@ -153,9 +154,9 @@
 ### Leaderboard Screen
 ```ascii
 ╔═════════════════════════════════════════════════════════════════════════╗
-║ 1. You: 72 WPM                                                          ║
-║ 2. Alice: 70 WPM                                                        ║
-║ 3. Bob: 68 WPM                                                          ║
+║ 1. User Name: 72 WPM                                                    ║
+║ 2. Another User: 70 WPM                                                 ║
+║ 3. Third User: 68 WPM                                                   ║
 ╚═════════════════════════════════════════════════════════════════════════╝
 ```
 

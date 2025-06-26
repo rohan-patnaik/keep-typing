@@ -8,6 +8,10 @@ export default function AuthForm() {
 
   const handleGoogleSignIn = async () => {
     setError(null);
+    if (!supabase) {
+      setError('Supabase client not initialized. Cannot sign in.');
+      return;
+    }
     const { error } = await supabase.auth.signInWithOAuth({
       provider: 'google',
       options: {

@@ -21,8 +21,17 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    if (!supabase) {
+      console.warn('Supabase client not initialized. Authentication features will be disabled.');
+      setLoading(false);
+      return;
+    }
+
+    // Create a local reference to the non-null supabase client
+    const supabaseClient = supabase;
+
     const getSession = async () => {
-      const { data } = await supabase.auth.getSession();
+      const { data } = await supabaseClient.auth.getSession();
       setSession(data.session);
       setUser(data.session?.user ?? null);
       setLoading(false);
@@ -30,7 +39,7 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
 
     getSession();
 
-    const { data: authListener } = supabase.auth.onAuthStateChange(
+    const { data: authListener } = supabaseClient.auth.onAuthStateChange(
       async (_event, session) => {
         setSession(session);
         setUser(session?.user ?? null);
@@ -45,7 +54,13 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
   const value = {
     session,
     user,
-    signOut: () => supabase.auth.signOut(),
+    signOut: () => {
+      if (supabase) {
+        supabase.auth.signOut();
+      } else {
+        console.warn('Supabase client not available for signOut.');
+      }
+    },
   };
 
   return (

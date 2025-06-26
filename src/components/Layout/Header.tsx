@@ -11,6 +11,9 @@ export default function Header() {
           keep-typing
         </Link>
         <div className="flex items-center space-x-4">
+          <Link href="/leaderboard" className="px-4 py-2 text-gray-300 hover:text-teal-300 transition-colors">
+            Leaderboard
+          </Link>
           {user ? (
             <>
               <span className="text-gray-300">{user.email}</span>

@@ -10,6 +10,13 @@ export interface TestResult {
   typed_at: string;
 }
 
+export interface LeaderboardEntry {
+  id: string;
+  wpm: number;
+  accuracy: number;
+  user_name: string; // Changed from user_email to user_name
+}
+
 /**
  * Saves a test result to the database.
  * @param userId The ID of the user.
@@ -22,6 +29,10 @@ export async function saveTestResult(
   metrics: MetricsOutput,
   durationSeconds: number
 ): Promise<TestResult | null> {
+  if (!supabase) {
+    console.error('Supabase client not initialized. Cannot save test result.');
+    return null;
+  }
   const { data, error } = await supabase
     .from('test_results')
     .insert([
@@ -48,9 +59,13 @@ export async function saveTestResult(
  * @returns An array of test results or null if an error occurred.
  */
 export async function fetchUserTestResults(userId: string): Promise<TestResult[] | null> {
+  if (!supabase) {
+    console.error('Supabase client not initialized. Cannot fetch user test results.');
+    return null;
+  }
   const { data, error } = await supabase
     .from('test_results')
-    .select('id, wpm, accuracy, duration_seconds, typed_at')
+    .select('id, user_id, wpm, accuracy, duration_seconds, typed_at')
     .eq('user_id', userId)
     .order('typed_at', { ascending: false });
 
@@ -59,4 +74,39 @@ export async function fetchUserTestResults(userId: string): Promise<TestResult[]
     return null;
   }
   return data;
+}
+
+/**
+ * Fetches top test results for the leaderboard.
+ * @param limit The maximum number of results to fetch. Defaults to 10.
+ * @returns An array of leaderboard entries or null if an error occurred.
+ */
+export async function fetchLeaderboardResults(limit: number = 10): Promise<LeaderboardEntry[] | null> {
+  if (!supabase) {
+    console.error('Supabase client not initialized. Cannot fetch leaderboard results.');
+    return null;
+  }
+  const { data, error } = await supabase
+    .from('test_results')
+    .select(`
+      id,
+      wpm,
+      accuracy,
+      user:auth_users(raw_user_meta_data)
+    `)
+    .order('wpm', { ascending: false })
+    .limit(limit);
+
+  if (error) {
+    console.error('Error fetching leaderboard results:', error);
+    return null;
+  }
+
+  // Map the data to the LeaderboardEntry interface, extracting the name from raw_user_meta_data
+  return data.map((entry: any) => ({
+    id: entry.id,
+    wpm: entry.wpm,
+    accuracy: entry.accuracy,
+    user_name: entry.user?.raw_user_meta_data?.full_name || entry.user?.raw_user_meta_data?.name || 'Anonymous',
+  }));
 }
