@@ -47,7 +47,7 @@
 - [x] #8 – Timer logic  
 - [x] #9 – WPM/accuracy calculations  
 - [x] #10 – TestScreen UI  
-- [] #11 – Unit tests  
+- [x] #11 – Unit tests  
 
 ### EPIC 3: Authentication & Persistence  
 - [ ] #12 – Supabase Auth integration  
