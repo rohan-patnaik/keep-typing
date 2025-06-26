@@ -54,7 +54,7 @@
 - [x] #13 – Results schema & API  
 - [x] #14 – Save/fetch results  
 - [x] #15 – SummaryScreen  
-- [ ] #16 – E2E tests  
+- [x] #16 – E2E tests  
 
 ### EPIC 4: Core UI Implementation  
 - [ ] #17 – Implement Home screen (V1)  

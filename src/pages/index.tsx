@@ -5,7 +5,7 @@ import { useAuth } from '../hooks/useAuth';
 import { saveTestResult } from '../lib/results';
 import SummaryScreen from '../components/SummaryScreen'; // Import SummaryScreen
 
-const SAMPLE_TEXT = "The quick brown fox jumps over the lazy dog.";
+const SAMPLE_TEXT = "The quick brown fox jumps over the lazy dog. He who is god shall be unnamed. What happens in vegas stays in vegas";
 const TEST_DURATION_SECONDS = 30;
 
 export default function TestScreen() {
