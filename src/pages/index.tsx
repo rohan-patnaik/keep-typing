@@ -1,6 +1,8 @@
 import { useState, useEffect, useRef } from 'react';
 import { Timer } from '../lib/timer';
 import { computeMetrics, MetricsOutput } from '../lib/metrics';
+import { useAuth } from '../hooks/useAuth'; // Import useAuth
+import { saveTestResult } from '../lib/results'; // Import saveTestResult
 
 const SAMPLE_TEXT = "The quick brown fox jumps over the lazy dog.";
 const TEST_DURATION_SECONDS = 30;
@@ -15,6 +17,7 @@ export default function TestScreen() {
 
   const timerRef = useRef<Timer | null>(null);
   const inputRef = useRef<HTMLInputElement | null>(null);
+  const { user } = useAuth(); // Get the current user
 
   useEffect(() => {
     if (inputRef.current && !testFinished) {
@@ -27,11 +30,18 @@ export default function TestScreen() {
       timerRef.current = new Timer(
         TEST_DURATION_SECONDS,
         (remaining) => setTimeLeft(remaining),
-        () => {
+        async () => { // Make onComplete async
           setTestFinished(true);
           setTestStarted(false);
           const finalMetrics = computeMetrics(textToType, userInput, TEST_DURATION_SECONDS);
           setResults(finalMetrics);
+
+          // Save results if user is logged in
+          if (user && finalMetrics) {
+            await saveTestResult(user.id, finalMetrics, TEST_DURATION_SECONDS);
+            console.log('Test result saved!');
+          }
+          console.log("Test finished!");
         }
       );
       timerRef.current.start();
@@ -39,7 +49,7 @@ export default function TestScreen() {
     return () => {
       timerRef.current?.reset();
     };
-  }, [testStarted, testFinished, textToType, userInput]);
+  }, [testStarted, testFinished, textToType, userInput, user]); // Add user to dependency array
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (testFinished) return;
