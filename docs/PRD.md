@@ -46,7 +46,7 @@
 ### EPIC 2: Typing Engine & Real-Time Feedback  
 - [x] #8 – Timer logic  
 - [x] #9 – WPM/accuracy calculations  
-- [] #10 – TestScreen UI  
+- [x] #10 – TestScreen UI  
 - [] #11 – Unit tests  
 
 ### EPIC 3: Authentication & Persistence  
