@@ -1,9 +1,9 @@
 import { useState, useEffect, useRef } from 'react';
 import { Timer } from '../lib/timer';
-import { computeMetrics, MetricsOutput } from '../lib/metrics'; // Import metrics functions
+import { computeMetrics, MetricsOutput } from '../lib/metrics';
 
 const SAMPLE_TEXT = "The quick brown fox jumps over the lazy dog.";
-const TEST_DURATION_SECONDS = 30; // Define test duration as a constant
+const TEST_DURATION_SECONDS = 30;
 
 export default function TestScreen() {
   const [textToType] = useState(SAMPLE_TEXT);
@@ -11,13 +11,12 @@ export default function TestScreen() {
   const [timeLeft, setTimeLeft] = useState(TEST_DURATION_SECONDS);
   const [testStarted, setTestStarted] = useState(false);
   const [testFinished, setTestFinished] = useState(false);
-  const [results, setResults] = useState<MetricsOutput | null>(null); // State for results
+  const [results, setResults] = useState<MetricsOutput | null>(null);
 
   const timerRef = useRef<Timer | null>(null);
-  const inputRef = useRef<HTMLInputElement | null>(null); // For focusing the hidden input
+  const inputRef = useRef<HTMLInputElement | null>(null);
 
   useEffect(() => {
-    // Focus the hidden input when the component mounts or test resets
     if (inputRef.current && !testFinished) {
       inputRef.current.focus();
     }
@@ -28,37 +27,31 @@ export default function TestScreen() {
       timerRef.current = new Timer(
         TEST_DURATION_SECONDS,
         (remaining) => setTimeLeft(remaining),
-        () => { // onComplete
+        () => {
           setTestFinished(true);
           setTestStarted(false);
           const finalMetrics = computeMetrics(textToType, userInput, TEST_DURATION_SECONDS);
           setResults(finalMetrics);
-          console.log("Test finished!");
         }
       );
       timerRef.current.start();
-    } else {
-      timerRef.current?.reset();
     }
     return () => {
       timerRef.current?.reset();
     };
-  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [testStarted, testFinished, textToType, userInput]);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (testFinished) return;
-
-    const currentInput = e.target.value;
-    if (!testStarted && currentInput.length > 0) {
-      setTestStarted(true); // Start the test on first character typed
+    if (!testStarted) {
+      setTestStarted(true);
     }
-    setUserInput(currentInput);
+    setUserInput(e.target.value);
   };
 
   const handleStartReset = () => {
     setTestFinished(false);
-    setTestStarted(false); // Will be set to true on first input
+    setTestStarted(false);
     setUserInput('');
     setResults(null);
     setTimeLeft(TEST_DURATION_SECONDS);
@@ -70,7 +63,7 @@ export default function TestScreen() {
 
   const renderTextDisplay = () => {
     return textToType.split('').map((char, index) => {
-      let className = "text-gray-500"; // Untyped text
+      let className = "text-gray-500";
       if (index < userInput.length) {
         className = char === userInput[index] ? "text-green-400" : "text-red-500";
       }
@@ -82,7 +75,7 @@ export default function TestScreen() {
   };
 
   return (
-    <div className="flex flex-col items-center justify-center min-h-screen bg-gray-800 text-gray-200 p-4 font-sans">
+    <div className="flex flex-col items-center justify-center p-4">
       <div className="w-full max-w-2xl p-6 bg-gray-900 rounded-xl shadow-2xl">
         <h1 className="text-4xl font-bold text-center mb-8 text-teal-400 tracking-wide">
           Typing Test
@@ -139,9 +132,6 @@ export default function TestScreen() {
           </div>
         )}
       </div>
-      <footer className="text-center text-gray-500 mt-10 text-xs">
-        <p>&copy; {new Date().getFullYear()} Keep Typing</p>
-      </footer>
     </div>
   );
 }

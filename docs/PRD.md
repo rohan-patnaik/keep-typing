@@ -50,7 +50,7 @@
 - [x] #11 – Unit tests  
 
 ### EPIC 3: Authentication & Persistence  
-- [ ] #12 – Supabase Auth integration  
+- [x] #12 – Supabase Auth integration  
 - [ ] #13 – Results schema & API  
 - [ ] #14 – Save/fetch results  
 - [ ] #15 – SummaryScreen  
@@ -132,11 +132,11 @@
 ### Auth Screen
 ```ascii
 ╔═════════════════════════════════════════════════════════════════════════╗
-║ Sign In ● ○ Sign Up                                                     ║
+║ Sign In                                                                 ║
 ╠═════════════════════════════════════════════════════════════════════════╣
-║ Email: [_________________]                                              ║
-║ Password: [________________]                                            ║
-║ [Continue]  [Google] [GitHub]                                           ║
+║                                                                         ║
+║                 [ Sign In with Google ]                                 ║
+║                                                                         ║
 ╚═════════════════════════════════════════════════════════════════════════╝
 ```
 

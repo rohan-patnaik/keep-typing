@@ -40,15 +40,14 @@ Home Screen
 2. 
 Auth Screen
 
-	- Unified signin/signup
-	- Social login options
+	- Google login only
 
 	╔═════════════════════════════════════════════════════════════════════════╗
-	║ Sign In ● ○ Sign Up                                                     ║
+	║ Sign In                                                                 ║
 	╠═════════════════════════════════════════════════════════════════════════╣
-	║ Email: [_________________]                                              ║
-	║ Password: [________________]                                            ║
-	║ [Continue]  [Google] [GitHub]                                           ║
+	║                                                                         ║
+	║                 [ Sign In with Google ]                                 ║
+	║                                                                         ║
 	╚═════════════════════════════════════════════════════════════════════════╝
 
 
