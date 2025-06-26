@@ -21,45 +21,25 @@ export function computeMetrics(
   typedText: string,
   durationSeconds: number
 ): MetricsOutput {
-  if (durationSeconds <= 0) {
+  if (durationSeconds <= 0 || typedText.length === 0) {
     return { rawWpm: 0, netWpm: 0, accuracy: 0, correctChars: 0, incorrectChars: 0, totalChars: 0 };
   }
 
-  const typedChars = typedText.length;
-  let correctChars = 0;
-  let incorrectChars = 0;
+  const durationMinutes = durationSeconds / 60;
+  const rawWpm = Math.round((typedText.length / 5) / durationMinutes);
 
-  for (let i = 0; i < typedChars; i++) {
-    if (i < originalText.length) {
-      if (typedText[i] === originalText[i]) {
-        correctChars++;
-      } else {
-        incorrectChars++;
-      }
-    } else {
-      // Any character typed beyond the original text length is an error
-      incorrectChars++;
+  let correctChars = 0;
+  for (let i = 0; i < typedText.length; i++) {
+    if (i < originalText.length && typedText[i] === originalText[i]) {
+      correctChars++;
     }
   }
 
-  // Standard WPM calculation uses 5 characters per word
-  const wordsTyped = typedChars / 5;
-  const minutes = durationSeconds / 60;
+  const incorrectChars = typedText.length - correctChars;
+  const accuracy = Math.round((correctChars / typedText.length) * 100);
 
-  const rawWpm = Math.round(wordsTyped / minutes);
+  const errorRate = incorrectChars / durationMinutes;
+  const netWpm = Math.max(0, Math.round(rawWpm - errorRate));
 
-  // Net WPM subtracts uncorrected errors
-  const uncorrectedErrors = incorrectChars / minutes;
-  const netWpm = Math.round(rawWpm - uncorrectedErrors);
-
-  const accuracy = typedChars > 0 ? Math.round((correctChars / typedChars) * 100) : 0;
-
-  return {
-    rawWpm: Math.max(0, rawWpm),
-    netWpm: Math.max(0, netWpm),
-    accuracy: Math.max(0, accuracy),
-    correctChars,
-    incorrectChars,
-    totalChars: typedChars,
-  };
+  return { rawWpm, netWpm, accuracy, correctChars, incorrectChars, totalChars: typedText.length };
 }

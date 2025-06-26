@@ -108,7 +108,7 @@ export default function TestScreen() {
         />
 
         <div className="flex justify-between items-center mt-8">
-          <div className="text-3xl font-bold text-teal-400 tabular-nums">
+          <div data-testid="time-left" className="text-3xl font-bold text-teal-400 tabular-nums">
             {timeLeft}s
           </div>
           <button
