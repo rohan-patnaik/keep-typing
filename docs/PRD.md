@@ -73,7 +73,7 @@
 ## 4. Phase 2: Enhancements (V2)
 
 ### EPIC A: Profile & Personalization  
-- [ ] #25 – User profile system  
+- [x] #25 – User profile system  
 - [ ] #26 – Achievement tracking  
 - [ ] #27 – Level progression  
 
