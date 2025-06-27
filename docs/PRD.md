@@ -78,8 +78,8 @@
 - [x] #27 – Level progression  
 
 ### EPIC B: Enhanced Social Features  
-- [ ] #28 – Friends leaderboards  
-- [ ] #29 – Result sharing  
+- [x] #28 – Friends leaderboards  
+- [x] #29 – Result sharing  
 - [ ] #30 – Activity feeds  
 
 ### EPIC C: UI Version Management  
@@ -154,9 +154,10 @@
 ### Leaderboard Screen
 ```ascii
 ╔═════════════════════════════════════════════════════════════════════════╗
-║ 1. User Name: 72 WPM                                                    ║
-║ 2. Another User: 70 WPM                                                 ║
-║ 3. Third User: 68 WPM                                                   ║
+║ 1. RandomUser123: 75 WPM | 98.5% Accuracy                               ║
+║ 2. AnotherCoder456: 72 WPM | 97.2% Accuracy                             ║
+║ 3. SwiftTypist789: 68 WPM | 99.1% Accuracy                              ║
+║ ... (20 entries)                                                        ║
 ╚═════════════════════════════════════════════════════════════════════════╝
 ```
 

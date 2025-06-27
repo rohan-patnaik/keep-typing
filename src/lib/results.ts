@@ -92,7 +92,7 @@ export async function saveTestResult(
  * @param userId The ID of the user.
  * @returns An array of test results or null if an error occurred.
  */
-export async function fetchUserTestResults(userId: string): Promise<TestResult[] | null> {
+export async function fetchMyTestResults(userId: string): Promise<TestResult[] | null> {
   if (!supabase) {
     console.error('Supabase client not initialized. Cannot fetch user test results.');
     return null;
@@ -113,14 +113,16 @@ export async function fetchUserTestResults(userId: string): Promise<TestResult[]
 /**
  * Fetches top test results for the leaderboard.
  * @param limit The maximum number of results to fetch. Defaults to 10.
+ * @param userId Optional. If provided, fetches results only for this user.
  * @returns An array of leaderboard entries or null if an error occurred.
  */
-export async function fetchLeaderboardResults(limit: number = 10): Promise<LeaderboardEntry[] | null> {
+export async function fetchLeaderboardResults(limit: number = 10, userId?: string): Promise<LeaderboardEntry[] | null> {
   if (!supabase) {
     console.error('Supabase client not initialized. Cannot fetch leaderboard results.');
     return null;
   }
-  const { data, error } = await supabase
+
+  let query = supabase
     .from('test_results')
     .select(`
       id,
@@ -128,8 +130,15 @@ export async function fetchLeaderboardResults(limit: number = 10): Promise<Leade
       accuracy,
       user:auth_users(raw_user_meta_data)
     `)
-    .order('wpm', { ascending: false })
-    .limit(limit);
+    .order('wpm', { ascending: false });
+
+  if (userId) {
+    query = query.eq('user_id', userId);
+  }
+
+  query = query.limit(limit);
+
+  const { data, error } = await query;
 
   if (error) {
     console.error('Error fetching leaderboard results:', error);

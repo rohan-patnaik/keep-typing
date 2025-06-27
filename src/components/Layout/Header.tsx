@@ -19,7 +19,6 @@ export default function Header() {
               <Link href="/profile" className="px-4 py-2 text-gray-300 hover:text-teal-300 transition-colors">
                 Profile
               </Link>
-              <span className="text-gray-300">{user.email}</span>
               <button
                 onClick={signOut}
                 className="px-4 py-2 bg-red-600 hover:bg-red-700 rounded-lg transition-colors"

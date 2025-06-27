@@ -5,9 +5,20 @@ interface SummaryScreenProps {
   results: MetricsOutput;
   onRetry: () => void;
   onNewTest: () => void;
+  testResultId: string; // New prop for the test result ID
 }
 
-export default function SummaryScreen({ results, onRetry, onNewTest }: SummaryScreenProps) {
+export default function SummaryScreen({ results, onRetry, onNewTest, testResultId }: SummaryScreenProps) {
+  const handleShare = () => {
+    const shareUrl = `${window.location.origin}/results/${testResultId}`;
+    navigator.clipboard.writeText(shareUrl).then(() => {
+      alert('Share link copied to clipboard!');
+    }).catch(err => {
+      console.error('Failed to copy: ', err);
+      alert('Failed to copy link.');
+    });
+  };
+
   return (
     <div className="mt-8 text-center p-6 bg-gray-800 rounded-lg shadow-xl">
       <h2 className="text-3xl font-semibold text-yellow-400 mb-4">Test Complete!</h2>
@@ -37,6 +48,12 @@ export default function SummaryScreen({ results, onRetry, onNewTest }: SummarySc
           className="px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white text-lg font-semibold rounded-lg shadow-md transition-all duration-150 ease-in-out"
         >
           New Test
+        </button>
+        <button
+          onClick={handleShare}
+          className="px-6 py-3 bg-purple-600 hover:bg-purple-700 text-white text-lg font-semibold rounded-lg shadow-md transition-all duration-150 ease-in-out"
+        >
+          Share
         </button>
       </div>
     </div>

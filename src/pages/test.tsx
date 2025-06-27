@@ -15,6 +15,7 @@ export default function TestScreen() {
   const [testStarted, setTestStarted] = useState(false);
   const [testFinished, setTestFinished] = useState(false);
   const [results, setResults] = useState<MetricsOutput | null>(null);
+  const [savedTestResultId, setSavedTestResultId] = useState<string | null>(null); // New state for saved result ID
 
   const timerRef = useRef<Timer | null>(null);
   const inputRef = useRef<HTMLInputElement | null>(null);
@@ -38,8 +39,11 @@ export default function TestScreen() {
           setResults(finalMetrics);
 
           if (user && finalMetrics) {
-            await saveTestResult(user.id, finalMetrics, TEST_DURATION_SECONDS);
-            console.log('Test result saved!');
+            const savedResult = await saveTestResult(user.id, finalMetrics, TEST_DURATION_SECONDS);
+            if (savedResult) {
+              setSavedTestResultId(savedResult.id); // Save the ID
+              console.log('Test result saved!', savedResult.id);
+            }
           }
           console.log("Test finished!");
         }
@@ -64,6 +68,7 @@ export default function TestScreen() {
     setTestStarted(false);
     setUserInput('');
     setResults(null);
+    setSavedTestResultId(null); // Reset saved ID
     setTimeLeft(TEST_DURATION_SECONDS);
     timerRef.current?.reset();
     if (inputRef.current) {
@@ -128,11 +133,12 @@ export default function TestScreen() {
           </div>
         )}
 
-        {testFinished && results && (
+        {testFinished && results && savedTestResultId && (
           <SummaryScreen
             results={results}
             onRetry={resetTest}
             onNewTest={resetTest}
+            testResultId={savedTestResultId}
           />
         )}
       </div>
