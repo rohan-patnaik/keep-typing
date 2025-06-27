@@ -1,8 +1,9 @@
 import React, { useEffect, useState } from 'react';
 import { useAuth } from '../hooks/useAuth';
-import { fetchUserAchievements, ALL_ACHIEVEMENTS, UserAchievement } from '../lib/achievements';
+import { fetchUserAchievements, UserAchievement } from '../lib/achievements';
 import { calculateLevel, LevelInfo } from '../lib/levels';
 import { supabase } from '../lib/supabaseClient';
+import { fetchMyTestResults, TestResult } from '../lib/results'; // Import fetchMyTestResults and TestResult
 
 export default function ProfilePage() {
   const { user } = useAuth();
@@ -10,6 +11,18 @@ export default function ProfilePage() {
   const [loadingAchievements, setLoadingAchievements] = useState(true);
   const [totalWpm, setTotalWpm] = useState<number>(0);
   const [loadingTotalWpm, setLoadingTotalWpm] = useState(true);
+  const [displayName, setDisplayName] = useState<string>('');
+  const [isEditingDisplayName, setIsEditingDisplayName] = useState(false);
+  const [savingDisplayName, setSavingDisplayName] = useState(false);
+  const [displayNameError, setDisplayNameError] = useState<string | null>(null);
+  const [recentTests, setRecentTests] = useState<TestResult[]>([]); // State for recent tests
+  const [loadingRecentTests, setLoadingRecentTests] = useState(true); // Loading state for recent tests
+
+  useEffect(() => {
+    if (user) {
+      setDisplayName(user.user_metadata?.full_name || user.user_metadata?.name || user.email || '');
+    }
+  }, [user]);
 
   useEffect(() => {
     async function getAchievements() {
@@ -31,20 +44,58 @@ export default function ProfilePage() {
         setLoadingTotalWpm(true);
         const { data, error } = await supabase
           .from('auth.users')
-          .select('total_wpm')
+          .select('raw_user_meta_data')
           .eq('id', user.id)
           .single();
 
         if (error) {
           console.error('Error fetching total WPM:', error);
         } else if (data) {
-          setTotalWpm(data.total_wpm || 0);
+          setTotalWpm(data.raw_user_meta_data?.total_wpm || 0);
         }
         setLoadingTotalWpm(false);
       }
     }
     fetchTotalWpm();
   }, [user]);
+
+  useEffect(() => {
+    async function getRecentTests() {
+      if (user) {
+        setLoadingRecentTests(true);
+        // Fetching only a few recent tests, e.g., last 5
+        const tests = await fetchMyTestResults(user.id);
+        if (tests) {
+          setRecentTests(tests.slice(0, 5)); // Displaying only the 5 most recent tests
+        }
+        setLoadingRecentTests(false);
+      }
+    }
+    getRecentTests();
+  }, [user]);
+
+  const handleSaveDisplayName = async () => {
+    if (!user || !supabase) return;
+    setSavingDisplayName(true);
+    setDisplayNameError(null);
+
+    try {
+      const { data, error } = await supabase.auth.updateUser({
+        data: { full_name: displayName },
+      });
+
+      if (error) {
+        setDisplayNameError(error.message);
+      } else {
+        console.log('Display name updated successfully:', data);
+        setIsEditingDisplayName(false);
+      }
+    } catch (err: any) {
+      setDisplayNameError(err.message);
+    } finally {
+      setSavingDisplayName(false);
+    }
+  };
 
   if (!user) {
     return (
@@ -65,8 +116,39 @@ export default function ProfilePage() {
         </h1>
 
         <div className="text-lg text-gray-200 space-y-4 mb-8">
-          <p><strong>Name:</strong> {userName}</p>
           <p><strong>Email:</strong> {user.email}</p>
+          <div className="flex items-center space-x-2">
+            <strong>Display Name:</strong>
+            {isEditingDisplayName ? (
+              <input
+                type="text"
+                value={displayName}
+                onChange={(e) => setDisplayName(e.target.value)}
+                className="flex-grow px-3 py-2 bg-gray-800 text-gray-200 border border-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500"
+                disabled={savingDisplayName}
+              />
+            ) : (
+              <span>{userName}</span>
+            )}
+            {isEditingDisplayName ? (
+              <button
+                onClick={handleSaveDisplayName}
+                disabled={savingDisplayName}
+                className="px-4 py-2 bg-green-600 hover:bg-green-700 text-white text-sm font-semibold rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                {savingDisplayName ? 'Saving...' : 'Save'}
+              </button>
+            ) : (
+              <button
+                onClick={() => setIsEditingDisplayName(true)}
+                className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white text-sm font-semibold rounded-lg transition-colors"
+              >
+                Edit
+              </button>
+            )}
+          </div>
+          {displayNameError && <p className="text-red-500 text-sm">{displayNameError}</p>}
+
           {loadingTotalWpm ? (
             <p>Loading level info...</p>
           ) : (
@@ -83,6 +165,28 @@ export default function ProfilePage() {
         </div>
 
         <h2 className="text-3xl font-bold text-center mb-6 text-teal-400 tracking-wide">
+          Recent Tests
+        </h2>
+
+        {loadingRecentTests ? (
+          <p className="text-center text-gray-400">Loading recent tests...</p>
+        ) : recentTests.length > 0 ? (
+          <div className="space-y-4">
+            {recentTests.map((test) => (
+              <div key={test.id} className="bg-gray-800 p-4 rounded-lg shadow-md flex justify-between items-center">
+                <div>
+                  <p className="text-xl font-semibold text-yellow-400">{test.wpm} WPM</p>
+                  <p className="text-gray-300">{test.accuracy}% Accuracy</p>
+                </div>
+                <p className="text-sm text-gray-500">{new Date(test.typed_at).toLocaleString()}</p>
+              </div>
+            ))}
+          </div>
+        ) : (
+          <p className="text-center text-gray-400">No recent tests found. Complete a test to see it here!</p>
+        )}
+
+        <h2 className="text-3xl font-bold text-center mb-6 mt-8 text-teal-400 tracking-wide">
           Achievements
         </h2>
 

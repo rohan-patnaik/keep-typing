@@ -80,7 +80,7 @@
 ### EPIC B: Enhanced Social Features  
 - [x] #28 – Friends leaderboards  
 - [x] #29 – Result sharing  
-- [ ] #30 – Activity feeds  
+- [x] #30 – Activity feeds  
 
 ### EPIC C: UI Version Management  
 - [ ] #31 – V1/V2 toggle component  
@@ -154,10 +154,16 @@
 ### Leaderboard Screen
 ```ascii
 ╔═════════════════════════════════════════════════════════════════════════╗
-║ 1. RandomUser123: 75 WPM | 98.5% Accuracy                               ║
-║ 2. AnotherCoder456: 72 WPM | 97.2% Accuracy                             ║
-║ 3. SwiftTypist789: 68 WPM | 99.1% Accuracy                              ║
-║ ... (20 entries)                                                        ║
+║ Leaderboard                                                             ║
+╠═════════════════════════════════════════════════════════════════════════╣
+║ [Global Leaderboard] [My Results]                                       ║
+║                                                                         ║
+║ (Global: Always 20 mock Reddit-style entries)                           ║
+║ (My Results: User's actual entries, or prompt to take test)             ║
+║                                                                         ║
+║ 1. RandomUser123: 75 WPM | 98% Accuracy                                 ║
+║ 2. AnotherCoder456: 72 WPM | 97% Accuracy                               ║
+║ ... (20 entries for Global)                                             ║
 ╚═════════════════════════════════════════════════════════════════════════╝
 ```
 

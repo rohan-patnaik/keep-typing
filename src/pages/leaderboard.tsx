@@ -14,6 +14,21 @@ const generateRandomUsername = () => {
   return `${randomAdjective}${randomNoun}${randomNumber}`;
 };
 
+// Generate 20 mock leaderboard entries
+const generateMockLeaderboard = (): LeaderboardEntry[] => {
+  const mockData: LeaderboardEntry[] = [];
+  for (let i = 0; i < 20; i++) {
+    mockData.push({
+      id: `mock-${i + 1}`,
+      wpm: Math.floor(Math.random() * (120 - 30 + 1)) + 30, // WPM between 30 and 120
+      accuracy: parseFloat((Math.random() * (100 - 85) + 85).toFixed(1)), // Accuracy between 85.0 and 100.0
+      user_name: generateRandomUsername(),
+    });
+  }
+  // Sort mock data by WPM descending
+  return mockData.sort((a, b) => b.wpm - a.wpm);
+};
+
 export default function LeaderboardPage() {
   const { user } = useAuth();
   const [leaderboard, setLeaderboard] = useState<LeaderboardEntry[] | null>(null);
@@ -21,52 +36,43 @@ export default function LeaderboardPage() {
   const [error, setError] = useState<string | null>(null);
   const [view, setView] = useState<LeaderboardView>(user ? 'my_results' : 'global');
 
-  // Generate 20 mock leaderboard entries
-  const generateMockLeaderboard = (): LeaderboardEntry[] => {
-    const mockData: LeaderboardEntry[] = [];
-    for (let i = 0; i < 20; i++) {
-      mockData.push({
-        id: `mock-${i + 1}`,
-        wpm: Math.floor(Math.random() * (120 - 30 + 1)) + 30, // WPM between 30 and 120
-        accuracy: parseFloat((Math.random() * (100 - 85) + 85).toFixed(1)), // Accuracy between 85.0 and 100.0
-        user_name: generateRandomUsername(),
-      });
-    }
-    // Sort mock data by WPM descending
-    return mockData.sort((a, b) => b.wpm - a.wpm);
-  };
-
   useEffect(() => {
-    async function getLeaderboard() {
+    async function loadLeaderboardData() {
       setLoading(true);
       setError(null);
-      let results: LeaderboardEntry[] | null = null;
+      let fetchedResults: LeaderboardEntry[] | null = null;
 
       if (view === 'global') {
-        // Use mock data for global leaderboard
-        results = generateMockLeaderboard();
+        // Always show mock data for global leaderboard
+        fetchedResults = generateMockLeaderboard();
       } else if (view === 'my_results' && user) {
         // Fetch real data for user's results
         const myRawResults = await fetchMyTestResults(user.id);
-        if (myRawResults) {
-          results = myRawResults.map(r => ({
+        if (myRawResults && myRawResults.length > 0) {
+          fetchedResults = myRawResults.map(r => ({
             id: r.id,
             wpm: r.wpm,
             accuracy: r.accuracy,
             user_name: user.user_metadata?.full_name || user.user_metadata?.name || user.email || 'You',
           }));
+        } else {
+          // If 'my_results' is empty, switch to global view and show a message
+          setView('global'); // This will trigger a re-render and re-fetch for 'global'
+          setError('You have no personal results yet. Showing global leaderboard. Take a test to see your results here!');
+          setLoading(false); // Set loading to false here to avoid infinite loading state
+          return; // Exit early, the re-render will handle fetching global
         }
       }
 
-      if (results) {
-        setLeaderboard(results);
-      } else {
+      if (fetchedResults) {
+        setLeaderboard(fetchedResults);
+      } else if (user) { // Only set error if logged in and fetching real data failed
         setError('Failed to load leaderboard.');
       }
       setLoading(false);
     }
-    getLeaderboard();
-  }, [view, user]);
+    loadLeaderboardData();
+  }, [view, user]); // Depend on view and user
 
   // If user logs out, switch to global view
   useEffect(() => {
@@ -74,22 +80,6 @@ export default function LeaderboardPage() {
       setView('global');
     }
   }, [user, view]);
-
-  if (loading) {
-    return (
-      <div className="flex justify-center items-center min-h-[calc(100vh-150px)]">
-        <p className="text-xl text-teal-400">Loading Leaderboard...</p>
-      </div>
-    );
-  }
-
-  if (error) {
-    return (
-      <div className="flex justify-center items-center min-h-[calc(100vh-150px)]">
-        <p className="text-xl text-red-500">Error: {error}</p>
-      </div>
-    );
-  }
 
   return (
     <div className="flex flex-col items-center justify-center p-4">
@@ -119,7 +109,13 @@ export default function LeaderboardPage() {
           </div>
         )}
 
-        {leaderboard && leaderboard.length > 0 ? (
+        {error && <p className="mt-4 text-center text-red-500">{error}</p>}
+
+        {loading ? (
+          <div className="flex justify-center items-center min-h-[200px]">
+            <p className="text-xl text-teal-400">Loading Leaderboard...</p>
+          </div>
+        ) : leaderboard && leaderboard.length > 0 ? (
           <div className="overflow-x-auto">
             <table className="min-w-full bg-gray-800 rounded-lg shadow-md">
               <thead>
@@ -144,7 +140,7 @@ export default function LeaderboardPage() {
           </div>
         ) : (
           <p className="text-center text-gray-400 text-lg">
-            {view === 'my_results' && !user ? 'Please sign in to view your results.' : 'No results yet. Be the first to set a score!'}
+            No results yet. Be the first to set a score!
           </p>
         )}
       </div>
